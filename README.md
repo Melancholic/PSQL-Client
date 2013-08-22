@@ -10,6 +10,8 @@ GUI Interface for database (PostgreSQL)
 VERSION 1.0
 ======================================
 
+![img](PSQL-client/data/screen/ver1_0/2013-08-22-232601_1020x675_scrot.png)
+
 implemented:
 
 1) Work with the base (basic operations with the table: add, open, delete);
