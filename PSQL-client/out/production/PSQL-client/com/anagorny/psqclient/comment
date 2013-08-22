@@ -1,0 +1,14 @@
+CREATE OR REPLACE  FUNCTION  ЗАКАЗЫ_trg_func() RETURNS trigger AS
+BEGIN
+NEW.id:=nextval('ЗАКАЗЫ_id_seq');
+return NEW;
+END;
+' LANGUAGE  plpgsql VOLATILE;
+
+
+ CREATE TRIGGER ЗАКАЗЫ_trg
+BEFORE INSERT ON ЗАКАЗЫ
+FOR EACH ROW
+EXECUTE PROCEDURE ЗАКАЗЫ_trg_func();
+
+

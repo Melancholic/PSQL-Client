@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: ./libs/postgresql-9.2-1003.jdbc4.jar
+Main-Class: com.anagorny.psqclient.PSQLClient
+
