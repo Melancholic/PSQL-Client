@@ -46,6 +46,7 @@ public class DBTableModel extends AbstractTableModel {
         return rows;
     }
 
+
     @Override
     public String getColumnName(int col) {
         String tmp = "";

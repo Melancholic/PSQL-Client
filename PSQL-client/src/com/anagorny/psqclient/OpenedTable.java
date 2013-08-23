@@ -268,6 +268,7 @@ public class OpenedTable {
         tableUpd();
         RowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table1.getModel());
         table1.setRowSorter(sorter);
+
     }
 
     private void closeThisTab() {

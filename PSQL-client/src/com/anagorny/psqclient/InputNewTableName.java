@@ -64,6 +64,7 @@ public class InputNewTableName extends JDialog {
     }
 
     private void onCancel() {
+        text = null;
         dispose();
     }
 }

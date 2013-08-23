@@ -36,6 +36,7 @@
         </constraints>
         <properties>
           <text value="All columns"/>
+          <toolTipText value="In the final sample will involve all columns."/>
         </properties>
       </component>
       <component id="e94f8" class="javax.swing.JRadioButton" binding="сolumnsOfTheListRadioButton" default-binding="true">
@@ -44,6 +45,7 @@
         </constraints>
         <properties>
           <text value="Сolumns of the list"/>
+          <toolTipText value="In the final sample will be used only columns from the list."/>
         </properties>
       </component>
       <component id="1846f" class="javax.swing.JList" binding="ColumnsList">
@@ -54,6 +56,7 @@
         </constraints>
         <properties>
           <model/>
+          <toolTipText value="These columns will be finished sample."/>
         </properties>
       </component>
       <component id="31a87" class="javax.swing.JLabel">
@@ -70,6 +73,7 @@
         </constraints>
         <properties>
           <text value="All values"/>
+          <toolTipText value="In the final sample will involve all values."/>
         </properties>
       </component>
       <component id="d7e" class="javax.swing.JLabel">
@@ -86,6 +90,7 @@
         </constraints>
         <properties>
           <text value="a ...A... 9"/>
+          <toolTipText value="sorted in ascending order."/>
         </properties>
       </component>
       <component id="8d1c7" class="javax.swing.JRadioButton" binding="a9AARadioButton" default-binding="true">
@@ -94,6 +99,7 @@
         </constraints>
         <properties>
           <text value="9 ...A... a"/>
+          <toolTipText value="Sorting in decreasing order"/>
         </properties>
       </component>
       <component id="f43bb" class="javax.swing.JList" binding="ColSortedList">
@@ -104,6 +110,7 @@
         </constraints>
         <properties>
           <model/>
+          <toolTipText value="This column will be made in the final sample sorting."/>
         </properties>
       </component>
       <component id="16a54" class="javax.swing.JComboBox" binding="ComboBoxOperations">
@@ -126,6 +133,7 @@
             <item value="LIKE"/>
             <item value="NOT LIKE"/>
           </model>
+          <toolTipText value="Selection of the operation or the operator of the rule"/>
         </properties>
       </component>
       <scrollpane id="87121">
@@ -162,7 +170,10 @@
         <constraints>
           <grid row="3" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties/>
+        <properties>
+          <model/>
+          <toolTipText value="Selecting a column about which rule applies."/>
+        </properties>
       </component>
       <component id="32c66" class="javax.swing.JRadioButton" binding="createAPlantRadioButton" default-binding="true">
         <constraints>
@@ -172,6 +183,7 @@
         </constraints>
         <properties>
           <text value="Create a plant:"/>
+          <toolTipText value="In the final sample will be used only values ​​from the list."/>
         </properties>
       </component>
       <component id="5a3b8" class="javax.swing.JButton" binding="OKButton" default-binding="true">

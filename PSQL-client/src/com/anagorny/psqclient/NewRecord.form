@@ -69,7 +69,7 @@
             </properties>
             <border type="line"/>
             <children>
-              <component id="89fc6" class="javax.swing.JTable" binding="table1" default-binding="true">
+              <component id="89fc6" class="com.anagorny.psqclient.DBTable" binding="table1" default-binding="true">
                 <constraints/>
                 <properties>
                   <autoCreateRowSorter value="false"/>

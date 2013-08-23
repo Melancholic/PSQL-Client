@@ -53,6 +53,7 @@
             </constraints>
             <properties>
               <text value="Save me"/>
+              <toolTipText value="Save this  settings for the next session."/>
             </properties>
           </component>
         </children>
@@ -73,6 +74,7 @@
             </constraints>
             <properties>
               <text value=""/>
+              <toolTipText value="User name. Exmpl: username."/>
             </properties>
           </component>
           <component id="37511" class="javax.swing.JPasswordField" binding="Passwd">
@@ -83,6 +85,7 @@
             </constraints>
             <properties>
               <text value=""/>
+              <toolTipText value="Your password. Exmpl: qwerty123"/>
             </properties>
           </component>
           <component id="46840" class="javax.swing.JTextField" binding="DBName">
@@ -93,6 +96,7 @@
             </constraints>
             <properties>
               <text value=""/>
+              <toolTipText value="Database name. Exmpl: database."/>
             </properties>
           </component>
           <component id="3a6ea" class="javax.swing.JTextField" binding="ServerName">
@@ -103,6 +107,7 @@
             </constraints>
             <properties>
               <text value=""/>
+              <toolTipText value="IP or Server name. Exmpl: 127.0.0.1, localhost"/>
             </properties>
           </component>
           <component id="b8b60" class="javax.swing.JList" binding="DBDrivers">
@@ -115,6 +120,7 @@
               <model>
                 <item value="jdbc:postgresql"/>
               </model>
+              <toolTipText value="Select Driver fo database."/>
             </properties>
           </component>
           <component id="b89cd" class="javax.swing.JLabel">

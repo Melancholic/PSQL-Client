@@ -48,7 +48,10 @@ public class makeSelection extends JFrame {
             StringBuffer newTableName = new StringBuffer();
             new InputNewTableName(newTableName);
             newTblName = newTableName.toString();
-            if (newTblName == null || newTblName.equals("") || newTblName.indexOf(" ") != -1) {
+            if (newTblName == null) {
+                return;
+            }
+            if (newTblName.equals("") || newTblName.indexOf(" ") != -1) {
                 UsersDialogs.Error("Uncorrect Table`s name!");
             } else {
                 break;
@@ -486,6 +489,7 @@ class StructValuesSelection {
             Text1.setMinimumSize(new Dimension(40, 40));
             Text1.setColumns(5);
             Text1.setVisible(true);
+            text1.setToolTipText("Format: number: 123; \n real number: 12.3; \n text: \'text\'; \n date: 'M/D/Y';");
             panel.add(Text1);
             panel.add(Box.createHorizontalStrut(10));
         }
@@ -499,6 +503,7 @@ class StructValuesSelection {
             Text2.setEnabled(true);
             Text2.setColumns(5);
             Text2.setVisible(true);
+            text2.setToolTipText("Format: number: 123; \n real number: 12.3; \n text: \'text\'; \n date: 'M/D/Y';");
             panel.add(Text2);
             panel.add(Box.createHorizontalStrut(10));
         }

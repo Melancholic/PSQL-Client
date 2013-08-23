@@ -9,8 +9,8 @@ public class NewRecord extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JPanel CompPanel;
-    private JTable table1;
-    private JTable bigTbl;
+    private DBTable table1;
+    private DBTable bigTbl;
 
     NewRecord(DBTableModelForNewRecord tblModel, DBTable tbl) {
         setPreferredSize(new Dimension(500, 220));

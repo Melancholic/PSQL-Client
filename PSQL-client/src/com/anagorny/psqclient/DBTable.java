@@ -1,6 +1,7 @@
 package com.anagorny.psqclient;
 
 import javax.swing.*;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 /**
@@ -17,6 +18,18 @@ public class DBTable extends JTable {
 
     public void mkTable(ArrayList<String[]> table) {
         this.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        //   this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        String result = "";
+        int column = columnAtPoint(event.getPoint());
+        if (column != -1) {
+            result = getModel().getColumnClass(column).getName();
+            result = result.substring(result.lastIndexOf(".") + 1);
+        }
+        return result;
     }
 
 }
