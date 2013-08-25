@@ -2,6 +2,7 @@ package com.anagorny.psqclient;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class InputNewTableName extends JDialog {
     private JPanel contentPane;
@@ -9,6 +10,7 @@ public class InputNewTableName extends JDialog {
     private JButton buttonCancel;
     private JTextField textField1;
     private StringBuffer text;
+
 
     public InputNewTableName(StringBuffer Text) {
         setTitle("Input name for new tables");

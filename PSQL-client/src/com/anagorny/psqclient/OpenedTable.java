@@ -12,6 +12,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.util.ArrayList;
 
 
@@ -41,6 +42,7 @@ public class OpenedTable {
     private DBTableModel tableModel;
     private ArrayList<String> NoNulled;
     private MenuWindow menuWin;
+    private String PrimaryKey;
 
     public OpenedTable(MenuWindow mw) {
         this(mw, mw.getSelectedTableName());
@@ -65,7 +67,7 @@ public class OpenedTable {
         addLineButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                new NewRecord(new DBTableModelForNewRecord(tableModel), table1);
+                new NewRecord(new DBTableModelForNewRecord(tableModel), OpenedTable.this);
                 RowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table1.getModel());
                 table1.setRowSorter(sorter);
             }
@@ -278,34 +280,17 @@ public class OpenedTable {
 
     private void save() {
         try {
-            CurrentBase.getBase().newConnect(CurrentBase.getBase().getConnect());
-            CurrentBase.getBase().getConnect().setAutoCommit(false);
-            tableModel.getCachRS().acceptChanges(CurrentBase.getBase().getConnect());
-            CurrentBase.getBase().getConnect().setAutoCommit(true);
+            Connection connect=null;
+            connect=CurrentBase.getBase().getNewConnect();
+            connect.setAutoCommit(false);
+            tableModel.getCachRS().acceptChanges(connect);
+            connect.setAutoCommit(true);
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
             System.err.println(e.getClass().getName() + " : " + e.getMessage());
         }
     }
-
-    // еще нужно!!
-   /*
-    public void InsertToBase(ArrayList<String> resultName, ArrayList<String> resultVal) {
-
-        //  tableUpd();
-        if (resultName == null || resultVal == null || resultName.size() != resultVal.size()) {
-            return;
-        }
-        if (!CurrentBase.getBase().insert(tableName, resultName, resultVal)) {
-            UsersDialogs.Error("Error in " + this.getClass().getName() + ": error when adding rows to a table");
-        }
-        // DefaultTableModel dm=(DefaultTableModel)table1.getModel();
-        // dm.addRow(resultVal.toArray());
-
-
-        //tableUpd();
-    }      */
 
     private void tableUpd() {
         tableArray = CurrentBase.getBase().select(tableName, "*");
@@ -318,6 +303,9 @@ public class OpenedTable {
                 }
             }
         }
+        PrimaryKey= CurrentBase.getBase().getPrimaryKey(tableName);
+        System.err.println("PRIMARY: "+ PrimaryKey);
+
         for (String s : NoNulled) {
             System.out.println("!0: " + s);
         }
@@ -339,6 +327,10 @@ public class OpenedTable {
         return tableName;
     }
 
+    public String getPrimaryKey() {
+        return PrimaryKey;
+    }
+
     public ArrayList<String> getColNames() {
         ArrayList<String> result = new ArrayList<>();
         for (int i = 0; i < table1.getColumnCount(); ++i) {
@@ -346,6 +338,7 @@ public class OpenedTable {
         }
         return result;
     }
+
 
     public MenuWindow getMenuWin() {
         return menuWin;

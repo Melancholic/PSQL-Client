@@ -3,6 +3,7 @@ package com.anagorny.psqclient;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class NewRecord extends JDialog {
     private JPanel contentPane;
@@ -10,13 +11,25 @@ public class NewRecord extends JDialog {
     private JButton buttonCancel;
     private JPanel CompPanel;
     private DBTable table1;
+    private JPanel LabelsPanel;
     private DBTable bigTbl;
+    private ArrayList<JLabel> Labels;
 
-    NewRecord(DBTableModelForNewRecord tblModel, DBTable tbl) {
+    NewRecord(DBTableModelForNewRecord tblModel,  OpenedTable OTable) {
+        Labels= new ArrayList<>();
+       // LabelsPanel= new JPanel();
+        LabelsPanel.setLayout(new GridLayout(4,4));
+        Labels.add(new JLabel("Primary Key: "+OTable.getPrimaryKey()));
+        for(String i : OTable.getNoNulled()){
+             Labels.add(new JLabel("Not Null: " + i));
+        }
+        for(JLabel label : Labels){
+            LabelsPanel.add(label);
+        }
         setPreferredSize(new Dimension(500, 220));
         setSize(700, 300);
         setResizable(false);
-        bigTbl = tbl;
+        bigTbl = OTable.getTable1();
         table1.setModel(tblModel);
         table1.setRowHeight(30);
         setContentPane(contentPane);

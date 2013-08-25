@@ -76,38 +76,49 @@ public class MenuWindow {
         openTableButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (TablesList.getSelectedValue() == null) {
+
+             /*   if (TablesList.getSelectedValue() == null) {
+                    UsersDialogs.Error("Select table in the tables list!");
+                    return;
+                }    */
+                ArrayList<String> tmpList = (ArrayList<String>) TablesList.getSelectedValuesList();
+                if (tmpList == null) {
                     UsersDialogs.Error("Select table in the tables list!");
                     return;
                 }
-                Thread newThread = new Thread(new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+                for (final String tmp : tmpList) {
+                    Thread newThread = new Thread(new Thread(new Runnable() {
+                        @Override
+                        public void run() {
 
-                        new OpenedTable(MenuWindowForNewThread);
-                    }
-                }));
-                newThread.start();
+                            new OpenedTable(MenuWindowForNewThread, tmp);
+                        }
+                    }));
+                    newThread.start();
+                }
 
             }
         });
         removeTableButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                String tmp = TablesList.getSelectedValue().toString();
-                if (tmp == null) {
+                // String tmp = TablesList.getSelectedValue().toString();
+                ArrayList<String> tmpList = (ArrayList<String>) TablesList.getSelectedValuesList();
+                if (tmpList == null) {
                     UsersDialogs.Error("Select table in the tables list!");
                     return;
                 }
                 System.err.println("www: " + MenuWindow.this.tabbedPane1.getComponentAt(0).getName());
-                for (int i = 0; i < MenuWindow.this.tabbedPane1.getComponentCount(); ++i) {
-                    System.err.println(MenuWindow.this.tabbedPane1.getComponentAt(i).getName());
-                    if (("Open Table " + tmp).equals(tabbedPane1.getComponentAt(i).getName())) {
-                        UsersDialogs.Error("Please, close this table!");
-                        return;
+                for (String tmp : tmpList) {
+                    for (int i = 0; i < MenuWindow.this.tabbedPane1.getComponentCount(); ++i) {
+                        System.err.println(MenuWindow.this.tabbedPane1.getComponentAt(i).getName());
+                        if (("Open Table " + tmp).equals(tabbedPane1.getComponentAt(i).getName())) {
+                            UsersDialogs.Error("Please, close this table!");
+                            return;
+                        }
                     }
+                    CurrentBase.getBase().remTable(tmp);
                 }
-                CurrentBase.getBase().remTable(tmp);
                 makeTablesList();
             }
         });

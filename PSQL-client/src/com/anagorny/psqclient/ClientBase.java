@@ -1,6 +1,10 @@
 package com.anagorny.psqclient;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.c3p0.DataSources;
+
 import javax.sql.rowset.CachedRowSet;
+import java.beans.PropertyVetoException;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,13 +18,14 @@ import java.util.ArrayList;
  */
 
 public class ClientBase {
-    private Connection connect = null;
-    private Statement stmt = null;
+    // private Connection connect = null;
+    // private Statement stmt = null;
     private String Url;
     private String fullUrl;
     private String dbName;
     private String Usr;
     private String Pass;
+    private ComboPooledDataSource ConnectPools; // Пул C3P0 ( Hello, StarWars! ^_^ )
 
     public ClientBase(String Driver, String url, String name, String user, String pass) throws SQLException {
         Url = url;
@@ -29,7 +34,22 @@ public class ClientBase {
         System.out.println(fullUrl);
         Usr = user;
         Pass = pass;
+
+        ConnectPools = new ComboPooledDataSource();
         try {
+            ConnectPools.setDriverClass("org.postgresql.Driver"); //loads the jdbc driver
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
+            //Тут лог об ошибке
+            System.err.println(e.getClass().getName() + " : " + e.getMessage());
+        }
+
+        ConnectPools.setJdbcUrl(fullUrl);
+        ConnectPools.setUser(Usr);
+        ConnectPools.setPassword(Pass);
+        ConnectPools.setMinPoolSize(25);
+
+     /*   try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -37,35 +57,29 @@ public class ClientBase {
             System.err.println(e.getClass().getName() + " : " + e.getMessage());
             System.exit(0);
         }
-        connect = DriverManager.getConnection(fullUrl, Usr, Pass);
-        stmt = connect.createStatement();
-       /*     CachRS = new CachedRowSetImpl();
-            CachRS.setUrl(fullUrl);
-            CachRS.setUsername(Usr);
-            CachRS.setPassword(Pass); */
+
+        Connection connect = DriverManager.getConnection(fullUrl, Usr, Pass);
+        Statement stmt = connect.createStatement();
+
         DriverManager.setLoginTimeout(20);
-
-
-       /* } catch (Exception e) {
-            e.printStackTrace();
-            //Тут лог об ошибке
-            System.err.println(e.getClass().getName() + " : " + e.getMessage());
-            System.exit(0);
-        }                     */
+               */
         System.out.println("Database opened");
 
 
     }
 
-    public void newConnect(Connection con) {
+    public Connection getNewConnect() {
+        Connection con = null;
         try {
-            Class.forName("org.postgresql.Driver");
-            con = DriverManager.getConnection(fullUrl, Usr, Pass);
+          //  Class.forName("org.postgresql.Driver");
+          //  con = DriverManager.getConnection(fullUrl, Usr, Pass);
+            con=ConnectPools.getConnection();
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
             System.err.println(e.getClass().getName() + " : " + e.getMessage());
         }
+        return con;
     }
 
     public void closeConnect(Connection con) {
@@ -108,11 +122,15 @@ public class ClientBase {
         //sql += ")";
         System.out.println("SQL: \n" + sql);
         try {
-            stmt = connect.createStatement();
+            Connection connect = null;
+            connect = getNewConnect();
+            connect= ConnectPools.getConnection();
+            Statement stmt = connect.createStatement();
             stmt.executeUpdate(sql);
             stmt.executeUpdate(sql_func);
             stmt.executeUpdate(sql_trig);
-            //stmt.close();
+            closeConnect(connect);
+            stmt.close();
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -126,10 +144,12 @@ public class ClientBase {
     public void remTable(String Name) {
         String sql = " DROP TABLE IF EXISTS  " + Name + ";";
         try {
-            newConnect(connect);
-            stmt = connect.createStatement();
+            Connection connect = null;
+            connect = getNewConnect();
+            Statement stmt = connect.createStatement();
             stmt.executeUpdate(sql);
-            //stmt.close();
+            closeConnect(connect);
+            stmt.close();
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -143,13 +163,15 @@ public class ClientBase {
     ArrayList<String> getTableList() {
         ArrayList<String> Tables = new ArrayList();
         try {
-            newConnect(connect);
+            Connection connect = null;
+            connect = getNewConnect();
             DatabaseMetaData metaData = connect.getMetaData();
             String[] types = {"TABLE", "VIEW"};
             ResultSet rs = metaData.getTables(dbName, null, "%", types);
             while (rs.next()) {
                 Tables.add(rs.getString("TABLE_NAME"));
             }
+            closeConnect(connect);
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -180,6 +202,8 @@ public class ClientBase {
     ArrayList<String> getColumnsName(String tableName) {
         ArrayList<String> paramName = new ArrayList<String>();
         try {
+            Connection connect = null;
+            connect = getNewConnect();
             DatabaseMetaData metaData = connect.getMetaData();
 
             ResultSet columns = metaData.getColumns(null, null, tableName, "%");
@@ -188,6 +212,7 @@ public class ClientBase {
                 paramName.add(columns.getString("COLUMN_NAME"));
 
             }
+            closeConnect(connect);
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -200,6 +225,8 @@ public class ClientBase {
     ArrayList<String> getColumnsType(String tableName) {
         ArrayList<String> paramName = new ArrayList<String>();
         try {
+            Connection connect = null;
+            connect = getNewConnect();
             DatabaseMetaData metaData = connect.getMetaData();
             ResultSet columns = metaData.getColumns(null, null, tableName, "%");
             while (columns.next()) {
@@ -207,6 +234,7 @@ public class ClientBase {
                 paramName.add(SQLTypesToString(columns.getInt("DATA_TYPE")));
 
             }
+            closeConnect(connect);
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -219,6 +247,8 @@ public class ClientBase {
     ArrayList<Integer> getColumnsTypeToInt(String tableName) {
         ArrayList<Integer> paramName = new ArrayList();
         try {
+            Connection connect = null;
+            connect = getNewConnect();
             DatabaseMetaData metaData = connect.getMetaData();
             ResultSet columns = metaData.getColumns(null, null, tableName, "%");
             while (columns.next()) {
@@ -226,6 +256,7 @@ public class ClientBase {
                 paramName.add((columns.getInt("DATA_TYPE")));
 
             }
+            closeConnect(connect);
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -238,6 +269,8 @@ public class ClientBase {
     int getType(String tableName, String colName) {
         int result = Integer.MIN_VALUE;
         try {
+            Connection connect = null;
+            connect = getNewConnect();
             DatabaseMetaData metaData = connect.getMetaData();
 
             ResultSet columns = metaData.getColumns(null, null, tableName, "%");
@@ -248,6 +281,7 @@ public class ClientBase {
                 }
 
             }
+            closeConnect(connect);
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -291,11 +325,13 @@ public class ClientBase {
                     sql += ",";
                 }
             }
-            System.err.println("SQL:" + sql);
-
+            Connection connect = null;
+            connect = getNewConnect();
+            Statement stmt = connect.createStatement();
             stmt.executeUpdate(sql);
             System.out.println("Record create");
-
+            closeConnect(connect);
+            stmt.close();
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -306,41 +342,11 @@ public class ClientBase {
 
     }
 
-    /*JTable select(String tableName, String operand, JTable table) {
-        // JTable table = new JTable();
-        DefaultTableModel dm = new DefaultTableModel();
-        try {
-            ResultSet rs = connect.createStatement().executeQuery("SELECT " + operand + " FROM " + tableName + ";");
-            ResultSetMetaData rsmd = rs.getMetaData();
-            ArrayList<String> colType = getColumnsType(tableName);
-            ArrayList<String> colName = getColumnsName(tableName);
-            int cols = rsmd.getColumnCount();
-            String c[] = new String[cols];
-            for (int i = 0; i < cols; i++) {
-                c[i] = rsmd.getColumnName(i + 1);
-                System.err.println("err: "+c[i]);
-                dm.addColumn(c[i]);
-            }
-            Object row[] = new Object[cols];
-            while (rs.next()) {
-                for (int i = 0; i < cols; i++) {
-                    row[i] = rs.getString(i + 1);
-                }
-                dm.addRow(row);
-            }
-            table.setModel(dm);
-        } catch (Exception e) {
-            e.printStackTrace();
-            //Тут лог об ошибке
-            System.err.println(e.getClass().getName() + " : " + e.getMessage());
-            System.exit(0);
-        }
-        return table;
-    }
-     */
     ArrayList<String[]> select(String tableName, String operand) {
         ArrayList<String[]> result = new ArrayList<String[]>();
         try {
+            Connection connect = null;
+            connect = getNewConnect();
             ResultSet rs = connect.createStatement().executeQuery("SELECT " + operand + " FROM " + tableName + ";");
             ResultSetMetaData rsmd = rs.getMetaData();
             ArrayList<String> colType = getColumnsType(tableName);
@@ -358,6 +364,7 @@ public class ClientBase {
                 }
                 result.add(row);
             }
+            closeConnect(connect);
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -368,49 +375,84 @@ public class ClientBase {
     }
 
     void selectToCachRow(String tableName, String operand, CachedRowSet CachRS) throws Exception {
-        //   System.err.println(CachRS == null);
-        // CachRS = new CachedRowSetImpl();
-        //      System.err.println(CachRS == null);
+        Connection connect = null;
+        connect = getNewConnect();
         CachRS.setUrl(fullUrl);
         CachRS.setUsername(Usr);
         CachRS.setPassword(Pass);
         CachRS.setCommand("SELECT " + operand + " FROM " + tableName + ";");
         CachRS.setTableName(tableName);
         CachRS.execute(connect);
-
+        closeConnect(connect);
     }
 
     void selectToCachRow(String sql, CachedRowSet CachRS) throws Exception {
-        //  System.err.println(CachRS == null);
-        // CachRS = new CachedRowSetImpl();
-        // System.err.println(CachRS == null);
-        CachRS.setUrl(fullUrl);
-        CachRS.setUsername(Usr);
-        CachRS.setPassword(Pass);
-        CachRS.setCommand(sql);
-        CachRS.execute(connect);
-
+        selectToCachRow(sql, " * ", CachRS);
     }
 
     void newRequest(String sql) throws Exception {
-        newConnect(connect);
+        Connection connect = null;
+        connect = getNewConnect();
+        Statement stmt = connect.createStatement();
+        connect = getNewConnect();
         stmt = connect.createStatement();
         stmt.executeUpdate(sql);
+        closeConnect(connect);
+        stmt.close();
+
     }
 
     void delete(String tableName, String colName, String colVal) throws Exception {
+        Connection connect = null;
+        connect = getNewConnect();
+        Statement stmt = connect.createStatement();
         stmt = connect.createStatement();
         String sql = "DELETE from " + tableName + " where " + colName + "=";
         sql += (SQLTypeIsText(getType(tableName, colName))) ? "\'" + colVal + "\'" : colVal;
         sql += ";";
         System.out.print(sql);
         stmt.executeUpdate(sql);
-        //  connect.commit();
+        //connect.commit();
+        closeConnect(connect);
+        stmt.close();
+    }
+
+    String getPrimaryKey(String tableName) {
+        String result = new String();
+        String sql = "SELECT c2.relname=\'" + tableName + "\', a.attname " +
+                "FROM pg_class c, pg_class c2, pg_index i, pg_attribute a " +
+                "WHERE c.relname = \'" + tableName + "\' AND c.oid = i.indrelid AND i.indexrelid = c2.oid " +
+                "AND i.indisprimary AND i.indisunique " +
+                "AND a.attrelid=c2.oid " +
+                "AND a.attnum>0;";
+        try {
+            Connection connect = null;
+            connect = getNewConnect();
+            Statement stmt = connect.createStatement();
+            System.err.print("SQL: " + sql);
+            connect = getNewConnect();
+            stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                result = rs.getString("attname");
+            }
+            closeConnect(connect);
+            stmt.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            //Тут лог об ошибке
+            System.err.println(e.getClass().getName() + " : " + e.getMessage());
+            System.exit(0);
+        }
+        return result;
+
     }
 
     ArrayList<String> getNullsName(String tableName) {
         ArrayList<String> result = new ArrayList<String>();
         try {
+            Connection connect = null;
+            connect = getNewConnect();
             ResultSet columns = connect.getMetaData().getColumns(null, "%", tableName, "%");
             while (columns.next()) {
                 boolean isNull = (1 == columns.getInt("NULLABLE"));
@@ -423,6 +465,7 @@ public class ClientBase {
                     }
                 }
             }
+            closeConnect(connect);
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -456,6 +499,8 @@ public class ClientBase {
     ArrayList<String> getPrimaryKeysName(String tableName) {
         ArrayList<String> result = new ArrayList<String>();
         try {
+            Connection connect = null;
+            connect = getNewConnect();
             ResultSet rs = connect.getMetaData().getPrimaryKeys(dbName, tableName, null);
             ResultSetMetaData rsmd = rs.getMetaData();
             int cols = rsmd.getColumnCount();
@@ -466,6 +511,7 @@ public class ClientBase {
 
                 }
             }
+            closeConnect(connect);
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -477,7 +523,8 @@ public class ClientBase {
 
     public void cleaner() {
         try {
-            if (connect != null && !connect.isClosed()) {
+            DataSources.destroy(ConnectPools);
+            /*if (connect != null && !connect.isClosed()) {
                 connect.close();
                 connect = null;
             }
@@ -485,7 +532,7 @@ public class ClientBase {
                 stmt.close();
                 stmt = null;
             }
-            System.out.println("Все почищено:)");
+            System.out.println("Все почищено:)"); */
         } catch (Exception e) {
             e.printStackTrace();
             //Тут лог об ошибке
@@ -516,8 +563,8 @@ public class ClientBase {
         return CachRS;
     }  */
 
-    public Connection getConnect() {
+  /*  public Connection getConnect() {
         return connect;
     }
-
+  */
 }

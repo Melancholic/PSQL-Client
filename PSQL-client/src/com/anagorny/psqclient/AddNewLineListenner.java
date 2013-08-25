@@ -6,6 +6,7 @@ import javax.sql.rowset.CachedRowSet;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -18,10 +19,10 @@ import java.sql.SQLException;
 
 
 public class AddNewLineListenner implements ActionListener {
-    JTable table;
+    DBTable table;
     NewRecord newRecFrame;
 
-    AddNewLineListenner(NewRecord newRecInst, JTable tbl) {
+    AddNewLineListenner(NewRecord newRecInst, DBTable tbl) {
         table = tbl;
         newRecFrame = newRecInst;
     }
@@ -50,18 +51,19 @@ public class AddNewLineListenner implements ActionListener {
             tmpModel.getCachRS().insertRow();
             tmpModel.getCachRS().moveToCurrentRow();
             tmpModel.getCachRS().beforeFirst();
-            CurrentBase.getBase().newConnect(CurrentBase.getBase().getConnect());
-            CurrentBase.getBase().getConnect().setAutoCommit(false);
-            tmpModel.getCachRS().acceptChanges(CurrentBase.getBase().getConnect());
+            Connection connect=null;
+            connect=CurrentBase.getBase().getNewConnect();
+            connect.setAutoCommit(false);
+            tmpModel.getCachRS().acceptChanges(connect);
             tmpModel.getCachRS().commit();
-            CurrentBase.getBase().getConnect().setAutoCommit(true);
+            connect.setAutoCommit(true);
         } catch (SQLException e) {
-            try {
-                CurrentBase.getBase().getConnect().setAutoCommit(false);
-                CurrentBase.getBase().getConnect().rollback();
+            /*try {
+               // connect.setAutoCommit(false);
+              //  connect.rollback();
             } catch (Exception ex) {
                 ex.printStackTrace();
-            }
+            } */
             e.printStackTrace();
             UsersDialogs.Message("SQL Exception: " + e.getMessage() + "\n" + "Err code: " + e.getErrorCode());
             return;
